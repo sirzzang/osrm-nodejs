@@ -2,7 +2,6 @@
 
 NodeJs routing server built with osrm-backend node wrapper
 
-<br>
 
 ## Setup
 
@@ -14,14 +13,14 @@ NodeJs routing server built with osrm-backend node wrapper
     ```
 
 2. preprocess pbf data
-  * MLD algorithm
-    ```bash
-    lib/binding/osrm-extract data/south-korea-latest.osm.pbf -p profiles/foot.lua
-    lib/binding/osrm-partition data/south-korea-latest.osrm
-    lib/binding/osrm-customize data/south-korea-latest.osrm
-    ```
-  * CH algorithm
-    ```bash
-    lib/binding/osrm-extract data/south-korea-latest.osm.pbf -p profiles/foot.lua
-    lib/binding/osrm-contract data/south-korea-latest.osrm
-    ```
+    * MLD algorithm
+        ```bash
+        lib/binding/osrm-extract data/south-korea-latest.osm.pbf -p profiles/foot.lua
+        lib/binding/osrm-partition data/south-korea-latest.osrm
+        lib/binding/osrm-customize data/south-korea-latest.osrm
+        ```
+    * CH algorithm
+        ```bash
+        lib/binding/osrm-extract data/south-korea-latest.osm.pbf -p profiles/foot.lua
+        lib/binding/osrm-contract data/south-korea-latest.osrm
+        ```
