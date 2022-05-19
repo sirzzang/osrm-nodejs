@@ -1,50 +1,74 @@
 process.env.UV_THREADPOOL_SIZE = Math.ceil(require('os').cpus().length * 1.5);
 
-var express = require('express');
-var OSRM = require('../lib/index');
-var path = require('path');
+// import modules
+const express = require("express");
+const OSRM = require("../lib/index")
+const path = require("path");
 
-var app = express();
-// var osrm = new OSRM(path.join(__dirname,"../test/data/ch/monaco.osrm"));
-// var osrm = new OSRM(path.join(__dirname, "../data/south-korea-latest.osrm"));
-// var osrm = new OSRM("/home/eraser/projects/osrm-backend/data/south-korea-latest.osrm");
-var osrm = new OSRM(
+// middleware settings
+const app = express();
+
+// OSRM instance
+const osrm = new OSRM(
     {
-        // path: '/home/eraser/projects/node-osrm/data/south-korea-latest.osrm',
         path: path.join(__dirname, "../data/south-korea-latest.osrm"),
-        algorithm: 'MLD'
+        algorithm: "MLD"
     }
 );
 
-// Accepts a query like:
-// http://localhost:8888?start=13.414307,52.521835&end=13.402290,52.523728
-// 126.485927,37.491975;126.508846,37.490757
-app.get('/', function(req, res) {
-    if (!req.query.start || !req.query.end) {
-        return res.json({"error":"invalid start and end query"});
+/**
+ * GET /route/duration api
+ * 
+ * Accepts a query like:
+ * http://localhost:9999/route/duration?from=126.485927,37.491975&to=126.508846,37.490757
+ */
+app.get("/route/duration", (req, res) => {
+
+    // bad request query
+    if (!req.query.from || !req.query.to) {
+        return res.json(
+            {
+                "error": "invalid query"
+            }
+        );
     }
-    var coordinates = [];
-    var start = req.query.start.split(',');
-    coordinates.push([+start[0],+start[1]]);
-    var end = req.query.end.split(',');
-    coordinates.push([+end[0],+end[1]]);
-    var query = {
+
+    // query coordinates: [[13.43864,52.51993],[13.415852,52.513191]]
+    const coordinates = []
+    coordinates.push(req.query.from.split(',').map(e => Number(e)));
+    coordinates.push(req.query.to.split(',').map(e => Number(e)));
+
+    // query parameters
+    const query = {
         coordinates: coordinates,
-        alternateRoute: req.query.alternatives !== 'false'
-    };
-    osrm.route(query, function(err, result) {
-        if (err) return res.json({"error":err.message});
-        console.log("success!!!!", res.result);
+        alternateRoute: req.query.alternatives !== 'false',
+        steps: req.query.steps != 'false',
+        annotaions: 'false',
+        overview: 'false'
+    }
+
+    // call route function
+    osrm.route(query, (err, result) => {
+        
+        if (err) {
+            return res.json(
+                {
+                    "error": err.message
+                }
+            );
+        }
+
+        console.log('success!', res);
         return res.json(result);
-    });
-});
+    })
 
-console.log('Listening on port: ' + 9999);
+
+})
+
+console.log('Server listening on port: ' + 9999);
 app.listen(9999);
-
-
 
 process.on('SIGINT', () => {
     console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
-    process.exit(0);
+    process.exit();
   });
